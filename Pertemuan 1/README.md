@@ -10,7 +10,43 @@ Jawaban:
 1. Program akan masuk ke blok if ketika kondisi yang telah ditentukan bernilai benar, yaitu saat parameter atau variabel sudah memenuhi batas tertentu yang diinginkan dalam program. Pada percobaan ini contohnya if (timeDelay <= 100).
 2. Program akan masuk ke blok else ketika kondisi pada if tidak terpenuhi (false), sehingga program menjalankan alternatif aksi yang telah disediakan. Pada percobaan ini jika timedelay > 100.
 3. Perintah delay(timeDelay) berfungsi untuk memberikan jeda waktu dalam eksekusi program sehingga mengatur kecepatan perubahan kondisi, misalnya memperlambat atau mempercepat nyala LED.
-4. 
+4. LED tidak langsung reset → tetapi berubah dari cepat → sedang → mati
+```cpp
+const int ledPin = 6;         // Menentukan pin yang digunakan untuk LED
+int timeDelay = 1000;         // Nilai awal delay (LED berkedip lambat)
+bool fasePerlambatan = false; // false = percepatan, true = perlambatan
+
+void setup() {
+  pinMode(ledPin, OUTPUT); // Mengatur pin LED sebagai output
+}
+
+void loop() {
+  digitalWrite(ledPin, HIGH); // Menyalakan LED
+  delay(timeDelay);           // Menunggu sesuai waktu delay
+
+  digitalWrite(ledPin, LOW);  // Mematikan LED
+  delay(timeDelay);           // Menunggu lagi
+
+  // Jika masih dalam fase percepatan
+  if (!fasePerlambatan) {
+    timeDelay -= 100; // Mengurangi delay → LED semakin cepat
+
+    // Jika sudah mencapai batas tercepat
+    if (timeDelay <= 100) {
+      fasePerlambatan = true; // Berpindah ke fase perlambatan
+    }
+  } 
+  else {
+    timeDelay += 200; // Menambah delay → LED semakin lambat
+
+    // Jika sudah mencapai batas tertentu (kecepatan sedang)
+    if (timeDelay >= 700) {
+      digitalWrite(ledPin, LOW); // Memastikan LED mati
+      while(true);               // Menghentikan program (loop berhenti)
+    }
+  }
+}
+
 
 1.6.2 Pertanyaan Praktikum
   1. Gambarkan rangkaian schematic 5 LED running yang digunakan pada percobaan!
@@ -43,7 +79,7 @@ void loop() {
     digitalWrite(i, LOW); // LED mati
   }
 
-  delay(timer); // Memberikan jeda agar perubahan terlihat
+  delay(timer); // Memberikan jeda
 
   // Menyalakan LED sisi kanan (pin 5, 6, 7)
   for (int i = 5; i <= 7; i++) {
