@@ -59,3 +59,35 @@ void loop() {
   delay(timer); // Jeda sebelum mengulang pola
 }
 
+## Source Code
+
+```cpp
+void setup() {
+  // Menginisialisasi pin 2 sampai 7 sebagai OUTPUT
+  for (int ledPin = 2; ledPin < 8; ledPin++) {
+    pinMode(ledPin, OUTPUT);
+  }
+}
+
+void loop() {
+
+  // --- MENYALAKAN 3 LED KIRI ---
+  for (int i = 2; i <= 4; i++) {
+    digitalWrite(i, HIGH); // LED kiri menyala
+  }
+  for (int i = 5; i <= 7; i++) {
+    digitalWrite(i, LOW); // LED kanan mati
+  }
+
+  delay(1000); // Jeda 1 detik
+
+  // --- MENYALAKAN 3 LED KANAN ---
+  for (int i = 2; i <= 4; i++) {
+    digitalWrite(i, LOW); // LED kiri mati
+  }
+  for (int i = 5; i <= 7; i++) {
+    digitalWrite(i, HIGH); // LED kanan menyala
+  }
+
+  delay(1000); // Jeda 1 detik
+}
