@@ -1,21 +1,25 @@
-# 📘 Praktikum Sistem Mikrokontroler
+# Praktikum Sistem Mikrokontroler
 
 ## IV. Pertanyaan Praktikum
 
 ---
 
-### 1) Jelaskan proses dari input keyboard hingga LED menyala/mati!
+### 1. Jelaskan proses dari input keyboard hingga LED menyala/mati!
+### 2. Mengapa digunakan Serial.available() sebelum membaca data? Apa yang terjadi jika baris tersebut dihilangkan?
+### 3. Modifikasi program agar LED berkedip (blink) ketika menerima input '2' dengan kondisi  jika ‘2’ aktif maka LED akan terus berkedip sampai perintah selanjutnya diberikan dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
+### 4. Tentukan apakah menggunakan delay() atau milis()! Jelaskan pengaruhnya terhadap sistem
 
 **Jawaban:**
-1. User mengetik input pada Serial Monitor.
-2. Data dikirim melalui komunikasi UART ke Arduino.
-3. Arduino mengecek data dengan `Serial.available()`.
-4. Data dibaca menggunakan `Serial.read()`.
-5. Program membandingkan input:
-   - '1' → LED menyala
-   - '0' → LED mati
-6. Arduino mengirim sinyal HIGH/LOW ke LED.
-7. LED menyala atau mati sesuai perintah.
+1. Proses input dari input keyboard hingga LED menyala/mati
+   1. User mengetik input pada Serial Monitor.
+   2. Data dikirim melalui komunikasi UART ke Arduino.
+   3. Arduino mengecek data dengan `Serial.available()`.
+   4. Data dibaca menggunakan `Serial.read()`.
+   5. Program membandingkan input:
+      - '1' → LED menyala
+      - '0' → LED mati
+   6. Arduino mengirim sinyal HIGH/LOW ke LED.
+   7. LED menyala atau mati sesuai perintah.
 
 ---
 
