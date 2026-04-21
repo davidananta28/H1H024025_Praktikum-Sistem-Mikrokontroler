@@ -1,16 +1,15 @@
 # Praktikum Sistem Mikrokontroler
 
+
 ## IV. Pertanyaan Praktikum
+1. Jelaskan proses dari input keyboard hingga LED menyala/mati!
+2. Mengapa digunakan Serial.available() sebelum membaca data? Apa yang terjadi jika baris tersebut dihilangkan?
+3. Modifikasi program agar LED berkedip (blink) ketika menerima input '2' dengan kondisi  jika ‘2’ aktif maka LED akan terus berkedip sampai perintah selanjutnya diberikan dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
+4. Tentukan apakah menggunakan delay() atau milis()! Jelaskan pengaruhnya terhadap sistem
 
 ---
 
-### 1. Jelaskan proses dari input keyboard hingga LED menyala/mati!
-### 2. Mengapa digunakan Serial.available() sebelum membaca data? Apa yang terjadi jika baris tersebut dihilangkan?
-### 3. Modifikasi program agar LED berkedip (blink) ketika menerima input '2' dengan kondisi  jika ‘2’ aktif maka LED akan terus berkedip sampai perintah selanjutnya diberikan dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
-### 4. Tentukan apakah menggunakan delay() atau milis()! Jelaskan pengaruhnya terhadap sistem
-
-**Jawaban:**
-1. Proses input dari input keyboard hingga LED menyala/mati
+### 1. Proses input dari input keyboard hingga LED menyala/mati
    1. User mengetik input pada Serial Monitor.
    2. Data dikirim melalui komunikasi UART ke Arduino.
    3. Arduino mengecek data dengan `Serial.available()`.
@@ -23,74 +22,61 @@
 
 ---
 
-### 2) Mengapa digunakan `Serial.available()`?
-
-**Jawaban:**
-Digunakan untuk memastikan data sudah tersedia sebelum dibaca.
-
-Jika dihapus:
-- Arduino tetap membaca walaupun tidak ada data
-- Bisa menghasilkan nilai acak
-- Program menjadi tidak stabil
+### 2. Mengapa digunakan Serial.available()
+Fungsi Serial.available() digunakan untuk memeriksa apakah terdapat data yang tersedia pada buffer serial sebelum dilakukan pembacaan. Hal ini penting untuk mencegah program membaca data yang belum tersedia, yang dapat menyebabkan error atau pembacaan data yang tidak valid. Jika fungsi ini dihilangkan, maka program akan tetap mencoba membaca data meskipun tidak ada data yang masuk, sehingga dapat menghasilkan nilai yang tidak sesuai atau menyebabkan perilaku sistem menjadi tidak stabil.
 
 ---
 
 ### 3) Program LED Blink saat input '2'
 
 ```cpp
-int led = 13;
-char data;
-bool blinking = false;
+#include <Arduino.h>
+
+const int PIN_LED = 12;
+char mode = '0'; 
 
 void setup() {
-  pinMode(led, OUTPUT);
   Serial.begin(9600);
+  Serial.println("Ketik '1' untuk menyalakan LED, '0' untuk mematikan LED, '2' untuk LED blink");
+  pinMode(PIN_LED, OUTPUT);
 }
 
 void loop() {
+  
   if (Serial.available() > 0) {
-    data = Serial.read();
-
-    if (data == '1') {
-      digitalWrite(led, HIGH);
-      blinking = false;
-    }
-    else if (data == '0') {
-      digitalWrite(led, LOW);
-      blinking = false;
-    }
-    else if (data == '2') {
-      blinking = true;
+    char inputBaru = Serial.read();    
+    if (inputBaru != '\n' && inputBaru != '\r') {
+      mode = inputBaru; 
+      if (mode == '1') {
+        digitalWrite(PIN_LED, HIGH);
+        Serial.println("Mode: LED ON");
+      } 
+      else if (mode == '0') {
+        digitalWrite(PIN_LED, LOW);
+        Serial.println("Mode: LED OFF");
+      } 
+      else if (mode == '2') {
+        Serial.println("Mode: LED BLINKING");
+      } 
+      else {
+        Serial.println("Perintah tidak dikenal");
+      }
     }
   }
-
-  if (blinking) {
-    digitalWrite(led, HIGH);
-    delay(500);
-    digitalWrite(led, LOW);
+  if (mode == '2') {
+    digitalWrite(PIN_LED, HIGH);
+    delay(100);
+    digitalWrite(PIN_LED, LOW);
     delay(500);
   }
 }
 ```
 
-**Penjelasan:**
-- `pinMode()` → set pin LED
-- `Serial.begin()` → mulai komunikasi
-- `Serial.read()` → baca input
-- `blinking` → kontrol mode kedip
-- `delay()` → jeda
-
 ---
 
-### 4) delay() atau millis()?
+### 4) Menggunakan delay() atau millis()
 
-**Jawaban:**
-- `delay()` → menghentikan program (blocking)
-- `millis()` → tidak menghentikan program (non-blocking)
-
-**Kesimpulan:**
-- delay cocok untuk sederhana
-- millis lebih baik untuk sistem kompleks
+Penggunaan delay() akan menghentikan seluruh proses pada mikrokontroler selama waktu tertentu, sehingga sistem tidak dapat menjalankan tugas lain secara bersamaan. Hal ini dapat menyebabkan sistem menjadi kurang responsif, terutama jika digunakan dalam aplikasi yang membutuhkan multitasking. Sebaliknya, millis() memungkinkan pengaturan waktu tanpa menghentikan proses utama, sehingga sistem tetap dapat menjalankan fungsi lain secara bersamaan. Penggunaan millis() lebih disarankan dalam sistem yang membutuhkan respons cepat dan efisiensi waktu
 
 ---
 
