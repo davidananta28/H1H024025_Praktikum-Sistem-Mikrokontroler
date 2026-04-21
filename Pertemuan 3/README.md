@@ -1,7 +1,7 @@
 # Praktikum Sistem Mikrokontroler
 
-
-## IV. Pertanyaan Praktikum
+## Percobaan 3A: Komunikasi Serial (UART) 
+### IV. Pertanyaan Praktikum
 1. Jelaskan proses dari input keyboard hingga LED menyala/mati!
 2. Mengapa digunakan Serial.available() sebelum membaca data? Apa yang terjadi jika baris tersebut dihilangkan?
 3. Modifikasi program agar LED berkedip (blink) ketika menerima input '2' dengan kondisi  jika ‘2’ aktif maka LED akan terus berkedip sampai perintah selanjutnya diberikan dan berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
@@ -80,41 +80,40 @@ Penggunaan delay() akan menghentikan seluruh proses pada mikrokontroler selama w
 
 ---
 
-## I2C dan LCD
-
-### 1) Cara kerja I2C
-
-**Jawaban:**
-- Menggunakan 2 jalur: SDA dan SCL
-- Arduino sebagai master
-- LCD sebagai slave
-- Data dikirim lalu ditampilkan di LCD
-
----
-
-### 2) Potensiometer
-
-**Jawaban:**
-Konfigurasi:
-- Kiri → GND
-- Tengah → Output
-- Kanan → VCC
-
-Jika tertukar:
-- Nilai tetap berubah
-- Arah putaran terbalik
+## Percobaan 3B: Inter-Integrated Circuit (I2C)
+### Pertanyaan Praktikum
+1. Jelaskan bagaimana cara kerja komunikasi I2C antara Arduino dan LCD pada rangkaian tersebut!
+2. Apakah pin potensiometer harus seperti itu? Jelaskan yang terjadi apabila pin kiri dan pin kanan tertukar!
+3. Modifikasi program dengan menggabungkan antara UART dan I2C (keduanya sebagai output) sehingga:
+    - Data tidak hanya ditampilkan di LCD tetapi juga di Serial Monitor
+    - Adapun data yang ditampilkan pada Serial Monitor sesuai dengan table berikut:
+    - ADC: 0  0% | setCursor(0, 0) dan Bar (level) | setCursor(0, 1)
+    - Berikan penjelasan disetiap baris kode nya dalam bentuk README.md!
+4.  Lengkapi table berikut berdasarkan pengamatan pada Serial Monitor 
 
 ---
 
-### 3) Program UART + I2C
+### 1. Cara kerja komunikasi I2C antara Arduino dan LCD pada rangkaian
+Komunikasi I2C antara Arduino dan LCD dilakukan melalui dua jalur utama, yaitu SDA (data) dan SCL (clock). Arduino berperan sebagai master yang mengontrol jalur clock dan mengirimkan data ke LCD sebagai slave. Setiap perangkat pada jaringan I2C memiliki alamat unik, sehingga Arduino dapat memilih perangkat tujuan dengan mengirimkan alamat tersebut sebelum mengirim data. Setelah alamat dikenali, data dikirim secara serial melalui jalur SDA dan disinkronkan menggunakan sinyal clock pada SCL. LCD kemudian menerima data tersebut dan menampilkannya sesuai dengan perintah yang diberikan.
+---
+
+### 2. Apakah pin potensiometer harus seperti itu
+
+Potensiometer memiliki tiga kaki, yaitu dua kaki sebagai sumber tegangan (VCC dan GND) serta satu kaki sebagai output yang terhubung ke pin analog Arduino. Jika posisi kaki kiri dan kanan (VCC dan GND) tertukar, maka arah perubahan nilai tegangan akan terbalik. Artinya, ketika potensiometer diputar ke arah tertentu, nilai yang terbaca akan berlawanan dengan kondisi normal.
+
+---
+
+### 3. Modifikasi program dengan menggabungkan antara UART dan I2C
 
 ```cpp
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <Arduino.h>
 
+// Inisialisasi LCD I2C (Alamat 0x27, 16 kolom, 2 baris)
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-int pot = A0;
-int value;
+
+const int pinPot = A0; 
 
 void setup() {
   Serial.begin(9600);
@@ -123,56 +122,55 @@ void setup() {
 }
 
 void loop() {
-  value = analogRead(pot);
+  int nilaiADC = analogRead(pinPot);
 
-  float volt = value * (5.0 / 1023.0);
-  int persen = map(value, 0, 1023, 0, 100);
+  // Kalkulasi Volt (0.00 - 5.00V) dan Persentase
+  float volt = (nilaiADC / 1023.0) * 5.0;
+  int persen = map(nilaiADC, 0, 1023, 0, 100);
 
+  // 1. Output ke Serial Monitor (Sesuai format tabel yang diminta)
   Serial.print("ADC: ");
-  Serial.print(value);
-  Serial.print("  ");
+  Serial.print(nilaiADC);
+  Serial.print(" Volt: ");
+  Serial.print(volt);
+  Serial.print(" V Persen: ");
   Serial.print(persen);
   Serial.println("%");
 
+  // 2. Output ke LCD (I2C)
+  // Baris 1: ADC, Volt, dan Persen
   lcd.setCursor(0, 0);
-  lcd.print("ADC:");
-  lcd.print(value);
+  lcd.print(nilaiADC);
   lcd.print(" ");
+  lcd.print(volt, 1); // Menampilkan 1 angka di belakang koma (misal 5.0)
+  lcd.print("V ");
   lcd.print(persen);
-  lcd.print("%   ");
+  lcd.print("%   "); // Spasi untuk clear sisa karakter
 
+  // Baris 2: Progress Bar (Level)
   lcd.setCursor(0, 1);
-
-  int bar = map(value, 0, 1023, 0, 16);
-
-  for (int i = 0; i < bar; i++) {
-    lcd.print((char)255);
+  int panjangBar = map(nilaiADC, 0, 1023, 0, 16);
+  for (int i = 0; i < 16; i++) {
+    if (i < panjangBar) {
+      lcd.print((char)255); 
+    } else {
+      lcd.print(" "); 
+    }
   }
-  for (int i = bar; i < 16; i++) {
-    lcd.print(" ");
-  }
 
-  delay(500);
+  delay(200); 
 }
 ```
 
 ---
 
-### 4) Tabel Pengamatan
+### 4) Table pengamatan pada Serial Monitor
 
 | ADC | Volt (V) | Persen (%) |
 |-----|----------|------------|
-| 1   | 0.00     | 0%         |
-| 21  | 0.10     | 2%         |
-| 49  | 0.24     | 5%         |
-| 74  | 0.36     | 7%         |
-| 96  | 0.47     | 9%         |
+| 1   | 0.       | 0%         |
+| 21  | 0.1      | 2%         |
+| 49  | 0.2      | 5%         |
+| 74  | 0.4      | 7%         |
+| 96  | 0.5      | 9%         |
 
----
-
-## Kesimpulan
-
-- Input diproses melalui UART
-- Output ditampilkan ke LED dan LCD
-- I2C digunakan untuk komunikasi LCD
-- Sistem berjalan sesuai perintah
