@@ -94,6 +94,7 @@ Penggunaan delay() akan menghentikan seluruh proses pada mikrokontroler selama w
 ---
 
 ### 1. Cara kerja komunikasi I2C antara Arduino dan LCD pada rangkaian
+
 Komunikasi I2C antara Arduino dan LCD dilakukan melalui dua jalur utama, yaitu SDA (data) dan SCL (clock). Arduino berperan sebagai master yang mengontrol jalur clock dan mengirimkan data ke LCD sebagai slave. Setiap perangkat pada jaringan I2C memiliki alamat unik, sehingga Arduino dapat memilih perangkat tujuan dengan mengirimkan alamat tersebut sebelum mengirim data. Setelah alamat dikenali, data dikirim secara serial melalui jalur SDA dan disinkronkan menggunakan sinyal clock pada SCL. LCD kemudian menerima data tersebut dan menampilkannya sesuai dengan perintah yang diberikan.
 ---
 
